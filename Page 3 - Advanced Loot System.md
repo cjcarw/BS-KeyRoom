@@ -146,31 +146,72 @@ json
 }
 ```
 - D. Replacement Containers
-This feature allows a common container to have a chance to be replaced by a rarer, more valuable one. If a replacement occurs, you can define a completely different set of loot rules for it.
 
-- All Replacement Parameters:
-- replacementChance: The probability (from 0.0 to 1.0) that this replacement will occur.
+Allows a common container to sometimes be replaced by a rarer one, with its own loot rules.
 
-- replacementClassName: The classname of the container that will spawn instead of the original one.
+Parameters:
 
-- replacementLootPoolName: Overrides the original lootPoolName for the replacement container.
+- replacementChance: Probability (0.0 → 1.0).
 
-- replacementRandomLootPools: Overrides the original randomLootPools array.
+- replacementClassName: New container class.
 
-- replacementLootMin: Overrides the original lootMin.
+- replacementLootPoolName: Overrides loot pool.
 
-- replacementLootMax: Overrides the original lootMax.
+- replacementRandomLootPools: Overrides random pools.
 
-- replacementUseFixedLoot: Overrides the original useFixedLoot. Set to 1 to spawn fixed items in the replacement.
+- replacementLootMin / replacementLootMax: Overrides loot counts.
 
-- replacementFixedItems: An array of fixed items that will only spawn if the replacement is successful.
+- replacementUseFixedLoot: Enables fixed loot in replacement.
 
-- replacementPreventDuplicateLoot: Overrides the original preventDuplicateLoot.
+- replacementFixedItems: Items that spawn only if replaced.
 
-- replacement_lb_preset_name: (String) The name of an LBmaster_Rework preset that will spawn only if the replacement is successful. This overrides all other replacement... loot settings.
+- replacementPreventDuplicateLoot: Duplicate prevention for replacement.
 
-- Advanced Replacement Example (with LBmaster):
-In this example, a common industrial crate has a 10% chance to be replaced by a rare weapon case. The replacement will spawn a full gear preset using LBmaster_Rework.
+- replacement_lb_preset_name: LBmaster preset for replacement.
+
+ Example 1: Standard Replacement (No LBmaster)
+```
+{
+    "referenceName": "MedicalCrate_Or_RareWeapon",
+    "className": "BS_Box1_White",
+    "lootPoolName": "Global_Medical_Supplies",
+    "lootMin": 2,
+    "lootMax": 4,
+    "replacementChance": 0.15,
+    "replacementClassName": "BS_Guncase_Black",
+    "replacementUseFixedLoot": 1,
+    "replacementFixedItems": [
+        {
+            "name": "SNAFUKivaari_Tan_GUN",
+            "quantity": 1,
+            "attachments": [
+                {
+                    "name": "SNAFUKivaari_10rdMag",
+                    "quantity": 10
+                },
+                {
+                    "name": "",
+                    "random_names": [
+                        "ACOGOptic",
+                        "M68Optic"
+                    ]
+                }
+            ]
+        }
+    ],
+    "replacementLootPoolName": "",
+    "replacementLootMin": 0,
+    "replacementLootMax": 0
+}
+```
+
+How it works:
+
+- 85% → White medical box, spawns 2–4 items from Global_Medical_Supplies.
+
+- 15% → Black guncase, spawns one Kivaari with mag + random optic.
+
+- Example 2: Replacement with LBmaster Preset
 ```
 {
     "referenceName": "NormalCrate_Or_LBmaster_Kit",
@@ -182,5 +223,10 @@ In this example, a common industrial crate has a 10% chance to be replaced by a 
     "replacementClassName": "BS_Guncase_Black",
     "replacement_lb_preset_name": "Full_SNAFU_SVD_Kit"
 }
+
 ```
-- How this works: Normally, this container spawns 2-3 industrial tools. However, 10% of the time, it will instead spawn as a BS_Guncase_Black containing a full SVD kit defined in your LBmaster_Rework presets, ignoring the industrial loot pool entirely.
+How it works:
+
+- 90% → Spawns 2–3 industrial tools.
+
+- 10% → Spawns a black guncase with a full SVD kit preset.
