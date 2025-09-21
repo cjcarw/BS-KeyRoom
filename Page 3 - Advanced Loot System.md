@@ -1,36 +1,42 @@
 # 3. Advanced Loot System
 
-The loot system is defined within the `containers` and `doorSpecificLootPools` parameters in a door's JSON file.
+The loot system is the most powerful feature of BS KeyRoom. You can configure it inside a door's JSON file through the `containers` array and the `doorSpecificLootPools` array.
 
-## 3.1. Configuring Loot Pools
+## 3.1. Loot Pools: The Foundation
 
-A "Loot Pool" is a list of items that can spawn. You can define them in two places:
+A "Loot Pool" is a list of potential items that can spawn. You can define them in two places:
 
-- **Global Pools**: In `BS_KeyRoom_Settings.json`. These can be used by any door.
-- **Door-Specific Pools**: In the `doorSpecificLootPools` parameter of a door's JSON. These can only be used by that specific door.
+- **Global Pools**: Defined in `BS_KeyRoom_Settings.json`. These pools can be used by any door on the server.
+- **Door-Specific Pools**: Defined inside a door's JSON file in the `doorSpecificLootPools` array. These pools can only be used by the containers within that same door configuration.
 
-**Example of a Loot Pool:**
+### How Rewards are Structured (Core Example)
+
+Let's break down an advanced item configuration. This structure can be used inside the `rewards` array of a loot pool, or inside the `fixedItems` array of a container.
 
 ```json
 {
-    "lootPoolName": "Weapons_Tier4",
-    "rewards": [
+    "name": "SNAFUKivaari_Tan_GUN",
+    "quantity": 1,
+    "attachments": [
         {
-            "name": "SVD",
-            "chanceToSpawn": 0.50,
-            "quantityMin": 1,
-            "quantityMax": 1,
+            "name": "SNAFUKivaari_10rdMag",
+            "quantity": 10,
+            "random_names": [],
+            "attachments": []
+        },
+        {
+            "name": "",
+            "quantity": 1,
+            "random_names": [
+                "ACOGOptic",
+                "M68Optic",
+                "BUISOptic"
+            ],
             "attachments": [
                 {
-                    "name": "PSO1Optic",
+                    "name": "Battery9V",
                     "quantity": 1,
                     "random_names": [],
-                    "attachments": []
-                },
-                {
-                    "name": "",
-                    "quantity": 1,
-                    "random_names": [ "AK_Suppressor", "ImprovisedSuppressor" ],
                     "attachments": []
                 }
             ]
@@ -38,112 +44,143 @@ A "Loot Pool" is a list of items that can spawn. You can define them in two plac
     ]
 }
 ```
-- lootPoolName: A unique name for this pool.
+Analysis of the Example:
+- The Base Item: "name": "SNAFUKivaari_Tan_GUN"
 
-- rewards: An array of items that can spawn.
+This is the main item that will be spawned.
 
-- name: The className of the item.
+- Direct Attachment: "name": "SNAFUKivaari_10rdMag"
 
-- chanceToSpawn: The weighted probability of this item being chosen.
+This is a simple attachment. The Kivaari will always spawn with this specific magazine attached. The magazine itself will spawn with 10 rounds because "quantity": 10.
 
-- quantityMin / quantityMax: The random quantity of the item that will spawn.
+- Randomized Attachment: "random_names": [ "ACOGOptic", "M68Optic", "BUISOptic" ]
 
-- attachments: An array to add attachments. You can nest attachments inside other attachments.
+This is a key feature. The name field is left empty (""), and the random_names array is used instead.
 
-- random_names: (Array of Strings) If the name field is empty, you can use this array to have the system pick one attachment randomly from the list.
-- 3.2. Container Configuration
-Inside the door's JSON, the containers array lists all possible containers that can spawn.
+The mod will randomly select one of the three optics from the list and attach it to the weapon. This is perfect for creating variety.
 
-Example of a Container:
+- Nested Attachment: attachments: [ { "name": "Battery9V", ... } ]
 
+This attachment is inside the randomized optic attachment.
+
+This means that whichever optic is randomly chosen, it will spawn with a Battery9V inside it. You can nest attachments as deep as you need.
+
+- 3.2. Container Configuration Types
+Now, let's see how to use this loot structure within the different types of containers you can define in your door's main JSON file.
+
+- A. Fixed Loot (useFixedLoot and fixedItems)
+This method is for loot that you want to always spawn in a container. It's predictable.
+
+- useFixedLoot: Must be set to 1 to enable this feature for the container.
+
+- fixedItems: An array of items to spawn, using the structure we analyzed above.
+
+- quantityMinPercent / quantityMaxPercent: Optional parameters for items. For example, you can make a magazine spawn with a random amount of ammo between 50% and 100% of its capacity.
+Example:
 ```
+json
 {
-    "referenceName": "Weapon_Crate_1",
-    "className": "BS_Guncase",
-    "position": [ 3678.13, 407.20, 5993.55 ],
-    "orientation": [ -123.19, 0.0, 0.0 ],
-    "spawnChance": 1.0,
-    "lootPoolName": "Weapons_Tier4",
+    "referenceName": "GuaranteedLootCrate",
+    "className": "BS_Box1_White",
+    "useFixedLoot": 1,
+    "fixedItems": [
+        {
+            "name": "Mag_STANAG_30Rnd",
+            "quantity": 30,
+            "quantityMinPercent": 0.5,
+            "quantityMaxPercent": 1.0
+        },
+        {
+            "name": "SNAFUKivaari_Tan_GUN",
+            "quantity": 1,
+            "attachments": [
+                {
+                    "name": "SNAFUKivaari_10rdMag",
+                    "quantity": 10
+                }
+            ]
+        }
+    ]
+}
+```
+
+B. Randomized Loot from Pools
+This method spawns a random number of items from one or more pre-defined loot pools, creating dynamic and unpredictable rewards.
+
+- lootPoolName: Use this if you want to pull loot from a single pool.
+
+- randomLootPools: An array of loot pool names. If spawnFromAllPools is 0, one pool will be chosen randomly from this list.
+
+- spawnFromAllPools: If set to 1, the system will attempt to spawn items from every pool listed in randomLootPools.
+
+- lootMin / lootMax: The total number of items to spawn from the selected pool(s).
+
+- preventDuplicateLoot: If 1, the system will not spawn the same item type more than once in this container.
+Example:
+```
+json
+{
+    "referenceName": "RandomMilitaryCrate",
+    "className": "BS_Box4_Green",
+    "randomLootPools": [
+        "Global_Military_Weapons_T4",
+        "Global_Military_Gear_T4"
+    ],
+    "spawnFromAllPools": 1,
     "lootMin": 1,
-    "lootMax": 2,
-    "useFixedLoot": 0,
-    "fixedItems": [],
-    "preventDuplicateLoot": 1
+    "lootMax": 2
 }
 ```
-- referenceName: A unique friendly name for this spawn point.
+- C. Integration with LBmaster Rework
+- If you use the LBmaster_Rework mod, you can make a container spawn a full preset from that mod, ignoring all other loot settings like fixedItems and lootPoolName.
 
-- className: The classname of the container to spawn.
+- lb_preset_name: (String) The exact name of the preset from LBmaster_Rework's configuration that you want to spawn.
 
-- position & orientation: The spawn coordinates for the container.
-
-- spawnChance: The weighted chance for this container to be chosen if min/max_containers_to_spawn is used.
-
-- 3.3. Fixed vs. Randomized Loot
-- Fixed Loot: To make an item always spawn, set useFixedLoot to 1 and define the items in the fixedItems array. This is great for guaranteed rewards. The structure of a fixedItem is similar to rewards but without chanceToSpawn. You can also use quantityMinPercent and quantityMaxPercent (from 0.0 to 1.0) to define the quantity as a percentage of its max capacity (e.g., for magazines or canteens).
-
-- Randomized Loot: To spawn random items from a pool, set useFixedLoot to 0 and use the following:
-
-lootPoolName: The name of a single pool to draw loot from.
-
-randomLootPools: (Array of Strings) If you provide multiple pool names here, the system will pick one at random to use.
-
-spawnFromAllPools: (0 or 1) If 1, the system will spawn loot from all pools listed in randomLootPools.
-
-lootMin / lootMax: The number of items to spawn from the chosen pool(s).
-
-preventDuplicateLoot: (0 or 1) If 1, prevents spawning the same item classname twice from the same pool in this container.
-
-- 3.4. Replacement Containers
-This powerful feature allows a standard container to have a chance of being replaced by a different, often rarer, one with its own unique loot setup.
-
-- replacementChance: (Float) The probability from 0.0 (never) to 1.0 (always) that the replacement will occur.
-
-- replacementClassName: (String) The classname of the container that will spawn if the replacement is successful.
-
-Overriding Loot Configuration: When a replacement occurs, you can completely redefine its loot table using a parallel set of parameters. If these are not defined, the replacement container will be empty.
-
-- replacementLootPoolName: (String) The single loot pool to use for the replacement container.
-
-- replacementRandomLootPools: (Array of Strings) A list of loot pools to randomly choose from for the replacement container.
-
-- replacementLootMin / replacementLootMax: (Integers) Min/Max number of items to spawn from the pool(s) for the replacement.
-
-- replacementUseFixedLoot: (0 or 1) Set to 1 to use fixed loot for the replacement.
-
-- replacementFixedItems: (Array of Objects) A list of fixed items that will always spawn in the replacement container.
-
-- replacementPreventDuplicateLoot: (0 or 1) Prevents duplicate items from spawning in the replacement container.
-
-- replacement_lb_preset_name: (String) If using LBmaster_Rework, this is the preset name for the replacement container.
-```        
+Example:
+```
+json
 {
-            "referenceName": "Rare_Weapon_Crate",
-            "className": "BS_Guncase_Green",
-            "position": [
-                3678.13,
-                407.2,
-                5993.55
-            ],
-            "orientation": [
-                -123.0,
-                0.0,
-                0.0
-            ],
-            "spawnChance": 0.1,
-            "lootPoolName": "Weapons_Rare",
-            "lootMin": 1,
-            "lootMax": 1,
-            "useFixedLoot": 0,
-            "fixedItems": [],
-            "preventDuplicateLoot": 1,
-            "replacementChance": 0.5,
-            "replacementClassName": "BS_Guncase_Black",
-            "replacementLootPoolName": "Weapons_Super_Rare",
-            "replacementLootMin": 1,
-            "replacementLootMax": 1,
-            "replacementUseFixedLoot": 0,
-            "replacementFixedItems": [],
-            "replacementPreventDuplicateLoot": 1
+    "referenceName": "LBmasterPresetCrate",
+    "className": "BS_Guncase_Black",
+    "lb_preset_name": "Full_SNAFU_M4_Kit"
 }
 ```
+- D. Replacement Containers
+This feature allows a common container to have a chance to be replaced by a rarer, more valuable one. If a replacement occurs, you can define a completely different set of loot rules for it.
+
+- All Replacement Parameters:
+- replacementChance: The probability (from 0.0 to 1.0) that this replacement will occur.
+
+- replacementClassName: The classname of the container that will spawn instead of the original one.
+
+- replacementLootPoolName: Overrides the original lootPoolName for the replacement container.
+
+- replacementRandomLootPools: Overrides the original randomLootPools array.
+
+- replacementLootMin: Overrides the original lootMin.
+
+- replacementLootMax: Overrides the original lootMax.
+
+- replacementUseFixedLoot: Overrides the original useFixedLoot. Set to 1 to spawn fixed items in the replacement.
+
+- replacementFixedItems: An array of fixed items that will only spawn if the replacement is successful.
+
+- replacementPreventDuplicateLoot: Overrides the original preventDuplicateLoot.
+
+- replacement_lb_preset_name: (String) The name of an LBmaster_Rework preset that will spawn only if the replacement is successful. This overrides all other replacement... loot settings.
+
+- Advanced Replacement Example (with LBmaster):
+In this example, a common industrial crate has a 10% chance to be replaced by a rare weapon case. The replacement will spawn a full gear preset using LBmaster_Rework.
+```
+{
+    "referenceName": "NormalCrate_Or_LBmaster_Kit",
+    "className": "BS_Box4_Black",
+    "lootPoolName": "Global_Industrial_Tools",
+    "lootMin": 2,
+    "lootMax": 3,
+    "replacementChance": 0.10,
+    "replacementClassName": "BS_Guncase_Black",
+    "replacement_lb_preset_name": "Full_SNAFU_SVD_Kit"
+}
+```
+- How this works: Normally, this container spawns 2-3 industrial tools. However, 10% of the time, it will instead spawn as a BS_Guncase_Black containing a full SVD kit defined in your LBmaster_Rework presets, ignoring the industrial loot pool entirely.
