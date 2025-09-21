@@ -57,21 +57,21 @@ Below is a comprehensive list of every parameter you can use in a door's JSON fi
 ```
 Parameter Explanations
 Core Identification
-x, y, z: Coordinates of the door. Do not modify manually; use the admin tool.
+- x, y, z: Coordinates of the door. Do not modify manually; use the admin tool.
 
-building_x, building_y, building_z: Coordinates of the building. Do not modify manually.
+- building_x, building_y, building_z: Coordinates of the building. Do not modify manually.
 
-door_indices: (Array of Integers) A list of all door indexes in the building that will be opened by this configuration. A single keycard can open multiple doors at once.
+- door_indices: (Array of Integers) A list of all door indexes in the building that will be opened by this configuration. A single keycard can open multiple doors at once.
 
-Location_Name: (String) A unique name to identify this door in logs. Must be unique across all your door files.
+- Location_Name: (String) A unique name to identify this door in logs. Must be unique across all your door files.
 
-BuildingClassName: (String) The classname of the building. Retrieved automatically by the admin tool.
+- BuildingClassName: (String) The classname of the building. Retrieved automatically by the admin tool.
 
-keycard_class_name: (String) The classname of the item (key or keycard) required to open this door.
+- keycard_class_name: (String) The classname of the item (key or keycard) required to open this door.
 
-unlockOnly: (0 or 1) If 1, the keycard only unlocks the door but does not physically open it. The player must open it manually. Default is 0.
+- unlockOnly: (0 or 1) If 1, the keycard only unlocks the door but does not physically open it. The player must open it manually. Default is 0.
 
-Announcements & Alarms
+- Announcements & Alarms
 use_announcement: (0 or 1) If 1, sends a global message to the server when the keycard is used.
 
 announcement_title: (String) The title of the global announcement.
@@ -80,33 +80,33 @@ announcement_text: (String) The body message of the announcement.
 
 announcement_color_rgba: (String) Color of the announcement in "A,R,G,B" format (for Expansion mod).
 
-use_alarm: (0 or 1) If 1, plays a looping alarm sound at the door's location.
+- use_alarm: (0 or 1) If 1, plays a looping alarm sound at the door's location.
 
-alarm_sound: (String) The SoundSet that will be played.
+- alarm_sound: (String) The SoundSet that will be played.
 
-alarm_duration: (Integer) Total duration in seconds the alarm will sound for.
+- alarm_duration: (Integer) Total duration in seconds the alarm will sound for.
 
-alarm_loop_delay: (Float) Time in seconds between each loop of the alarm sound.
+- alarm_loop_delay: (Float) Time in seconds between each loop of the alarm sound.
 
-Timers
+- Timers
 min_unlock_time / max_unlock_time: (Integers) The random time in seconds it takes for the door to open after the card is swiped.
 
 min_restock_time / max_restock_time: (Integers) The random time in seconds the door remains open before it automatically closes.
 
-Loot & Containers
-containers_only: (0 or 1) If 1, loot containers are static and already present on the server. The door will not be openable, serving as a persistent loot zone.
+- Loot & Containers
+- containers_only: (0 or 1) If 1, loot containers are static and already present on the server. The door will not be openable, serving as a persistent loot zone.
 
-min_containers_to_spawn / max_containers_to_spawn: (Integers) The min/max number of containers that will spawn from the containers list. Set to -1 to spawn all.
+- min_containers_to_spawn / max_containers_to_spawn: (Integers) The min/max number of containers that will spawn from the containers list. Set to -1 to spawn all.
 
 See [[3. Advanced Loot System]] for details on containers and doorSpecificLootPools.
 
-Safety & Restarts
-persistCooldownOnRestart: (0 or 1) If 1, the door's open state and timer will survive a server restart. Highly recommended.
+- Safety & Restarts
+- persistCooldownOnRestart: (0 or 1) If 1, the door's open state and timer will survive a server restart. Highly recommended.
 
-use_safety_teleport: (0 or 1) If 1, teleports players out of the room before the door closes to prevent them from getting trapped.
+- use_safety_teleport: (0 or 1) If 1, teleports players out of the room before the door closes to prevent them from getting trapped.
 
-safety_teleport_radius: (Float) The radius in meters for the safety teleport check.
+- safety_teleport_radius: (Float) The radius in meters for the safety teleport check.
 
-use_custom_teleport_points: (0 or 1) If 1, uses one of the points defined in custom_teleport_points for the teleport.
+- use_custom_teleport_points: (0 or 1) If 1, uses one of the points defined in custom_teleport_points for the teleport.
 
 
