@@ -47,7 +47,7 @@ The text after the | becomes the item's tooltip description.
 
 1: Single-use. The item will be destroyed after one use.
 
-> 1: Multiple uses. The item will have a counter (e.g., [4/5]) and will be destroyed after the last use.
+1: Multiple uses. The item will have a counter (e.g., [4/5]) and will be destroyed after the last use.
 
 -1: Infinite uses. The item can be used forever.
 
